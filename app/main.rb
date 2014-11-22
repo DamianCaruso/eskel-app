@@ -1,5 +1,6 @@
-require 'tilt/erubis'
-Cuba.settings[:render][:template_engine] = 'erb'
+Cuba.settings[:render][:template_engine] = 'slim'
+
+Cuba.plugin Helpers::Assets
 
 Cuba.use Rack::Rewrite do
   rewrite %r{^/(css|js|img)/(.*)/cb(.[^\/]*)$}, '/$1/$2'

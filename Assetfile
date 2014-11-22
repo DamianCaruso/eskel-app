@@ -1,0 +1,81 @@
+require 'rake-pipeline-web-filters'
+require 'compass'
+require 'uglifier'
+require 'digest/sha1'
+
+RACK_ENV = ENV['RACK_ENV'] || 'development'
+REVISION = File.exists?('REVISION') ? File.open('REVISION','r') { |f| f.gets.chomp } : nil
+
+Compass.configuration do |c|
+  c.images_path      = 'app/assets/img'
+  c.http_images_path = '/img'
+
+  c.asset_cache_buster do |path, file|
+    if file and REVISION
+      digest = Digest::SHA1.hexdigest(Time.now.to_i.to_s)
+      {:path => "#{path}/cb#{digest}", :query => nil}
+    end
+  end
+end
+
+ExecJS.runtime = ExecJS::Runtimes::Node
+
+output 'public/js'
+input 'app/assets/js' do
+  match %r(\.coffee$) do
+    coffee_script
+  end
+
+  match '*.js' do
+    concat 'application.js'
+  end
+
+  if RACK_ENV == 'production'
+    match '*.js' do
+      opts = { 
+        :output => { 
+          :comments => :copyright 
+        }
+      }
+      uglify(opts) { |path| path }
+      copy { |name| [name, "#{name}.gz"] }
+    end
+
+    match '**/*.gz' do
+      gzip { |path| path }
+    end
+  end
+end
+
+output 'public/css'
+input 'app/assets/css' do
+  match 'site.scss' do
+    sass
+    concat 'application.css'
+  end
+
+  if RACK_ENV == 'production'
+    match '*.css' do
+      yui_css { |path| path }
+      copy { |name| [name, "#{name}.gz"] }
+    end
+
+    match '**/*.gz' do
+      gzip { |path| path }
+    end
+  end
+end
+
+output 'public/img'
+input 'app/assets/img' do
+  match '**/*' do
+    copy
+  end
+end
+
+output 'public'
+input 'app/assets/static' do
+  match '**/*' do
+    copy
+  end
+end
