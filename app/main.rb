@@ -1,12 +1,11 @@
 Cuba.settings[:render][:template_engine] = 'slim'
 
-Cuba.plugin Helpers::Assets
-
 Cuba.use Rack::Rewrite do
-  rewrite %r{^/(css|js|img)/(.*)/cb(.[^\/]*)$}, '/$1/$2'
+  rewrite %r{^/(stylesheets|javascripts|images|fonts)/(.*)/(.[^\/]*)$}, '/$1/$2'
 end
+
 Cuba.use Rack::Sendfile 
-Cuba.use Rack::TryStatic, root: './public', urls: %w[/]
+Cuba.use Rack::Zippy::AssetServer, './public'
 Cuba.use Rack::Runtime
 Cuba.use Rack::RequestId
 Cuba.use Rack::CommonLogger

@@ -1,20 +1,19 @@
 source 'https://rubygems.org'
 ruby '2.1.5'
 
-gem 'eskel', '0.0.1'
+gem 'eskel', github: 'DamianCaruso/eskel'
 gem 'slim'
 
-gem 'rack-contrib',              github: 'rack/rack-contrib'
 gem 'rack-protection'
 gem 'rack-request-id'
 gem 'rack-rewrite'
+gem 'rack-zippy'
 
 gem 'rake-pipeline',             github: 'livingsocial/rake-pipeline'
 gem 'rake-pipeline-web-filters', github: 'wycats/rake-pipeline-web-filters'
 
 gem 'coffee-script'
 gem 'compass'
-gem 'uglifier'
 gem 'yui-compressor'
 
 group :production do
